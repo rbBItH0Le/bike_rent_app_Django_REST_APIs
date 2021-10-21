@@ -1,0 +1,49 @@
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.conf import settings
+from django.db.models.fields.related import ForeignKey
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+# Create your models here.
+
+
+
+class Customodel(models.Model):
+    id=models.IntegerField(primary_key=True,unique=True)
+    first_name=models.CharField(max_length=50)
+    last_name=models.CharField(max_length=50)
+    email=models.CharField(max_length=50)
+    hashed_password=models.CharField(max_length=100)
+    phone=models.CharField(max_length=15)
+    post_code=models.CharField(max_length=10)
+    security_question=models.CharField(max_length=150)
+    security_answer=models.CharField(max_length=100)
+    favorite_station_id=models.IntegerField()
+    active_trip_id=models.IntegerField()
+    email_verified=models.IntegerField()
+    session_id=models.IntegerField()
+
+    class Meta:
+        db_table='t_customers'
+
+class Custsessionmodel(models.Model):
+    id=models.IntegerField(primary_key=True)
+    customer_id=models.IntegerField()
+    access_token=models.CharField(max_length=200)
+
+    class Meta:
+        db_table='t_customer_sessions'
+
+
+class Paymentmodel(models.Model):
+    id=models.IntegerField(primary_key=True)
+    customer_id=models.IntegerField()
+    transaction_time=models.CharField(max_length=100)
+    transaction_id=models.CharField(max_length=50)
+    payment_method=models.CharField(max_length=20)
+    card_number=models.CharField(max_length=15)
+
+    class Meta:
+        db_table='t_payments'
+

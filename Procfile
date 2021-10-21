@@ -1,0 +1,1 @@
+web: gunicorn bikez.wsgi --log-file -
