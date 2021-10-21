@@ -6,7 +6,6 @@ coreapi==2.3.3
 dj-database-url==0.5.0
 gunicorn==20.0.4
 whitenoise==5.0.1
-asgiref==version
 django-cors-headers==version
 django-heroku==version
 psycopg2==version
