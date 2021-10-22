@@ -22,7 +22,7 @@ class Operatormodel(models.Model):
         db_table='t_operators'
 
 class Operatsessionmodel(models.Model):
-        id=models.IntegerField(primary_key=True)
+        id=models.AutoField(primary_key=True)
         customer_id=models.IntegerField()
         access_token=models.CharField(max_length=200)
 

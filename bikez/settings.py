@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'bikez.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME':'bikez',
+        'NAME':'bikeez',
         'USER':'postgres',
         'PASSWORD':'adminroot123',
         'HOST':'localhost',
