@@ -5,7 +5,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
-from operators.serialization import Empserialize, Sesserialize, Stationalize
+from operators.models import Cyclemodel
+from operators.serialization import Cyclenalize, Empserialize, Sesserialize, Stationalize
 from operators.models import Operatormodel,Operatsessionmodel,Stationmodel
 from django.core import serializers
 from django.http import HttpResponse
@@ -99,4 +100,59 @@ def showstation(request):
     if request.method=='POST':
         stations=Stationmodel.objects.all()
         serialize=Stationalize(stations,many=True)
+        return Response(serialize.data,status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def addcycles(request):
+    access=request.POST['access_token']
+    if request.method=='POST':
+        if Operatsessionmodel.objects.filter(access_token=access).exists()==False:
+            data={}
+            data['Message']='Not Authorized'
+            return Response(data,status=status.HTTP_401_UNAUTHORIZED)
+        oper=Operatsessionmodel.objects.get(access_token=access).operator_id
+        cycles=Cyclemodel()
+        cycles.operator_id=oper
+        serialize=Cyclenalize(cycles,request.data)
+        if serialize.is_valid():
+            serialize.save()
+            return Response(serialize.data,status=status.HTTP_200_OK)
+        return Response(serialize.errors,status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def deletecycle(request):
+    access=request.POST['access_token']
+    if request.method=='DELETE':
+        if Operatsessionmodel.objects.filter(access_token=access).exists()==False:
+            data={}
+            data['Message']='Not Authorized'
+            return Response(data,status=status.HTTP_401_UNAUTHORIZED)
+        if Cyclemodel.objects.filter(id=request.POST['id']).exists()==False:
+            data={}
+            data['Message']="Object doesnt exist"
+            return Response(data,status=status.HTTP_404_NOT_FOUND)
+        Cyclemodel.objects.get(id=request.POST['id']).delete()
+        data={}
+        data['Message']="Cycle has been removed"
+        return Response(data,status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def movecycle(request):
+    access=request.POST['access_token']
+    if request.method=='PUT':
+        if Operatsessionmodel.objects.filter(access_token=access).exists()==False:
+            data={}
+            data['Message']='Not Authorized'
+            return Response(data,status=status.HTTP_401_UNAUTHORIZED)
+        if Cyclemodel.objects.filter(id=request.POST['id']).exists()==False:
+            data={}
+            data['Message']="Object doesnt exist"
+            return Response(data,status=status.HTTP_404_NOT_FOUND)
+        Cyclemodel.objects.filter(id=request.POST['id']).update(station_id=request.POST['station_id'])
+        Cyclemodel.objects.filter(id=request.POST['id']).update(cycle_code=request.POST['cycle_code'])
+        Cyclemodel.objects.filter(id=request.POST['id']).update(model_number=request.POST['model_number'])
+        results=Cyclemodel.objects.get(pk=request.POST['id'])
+        serialize=Cyclenalize(results)
         return Response(serialize.data,status=status.HTTP_200_OK)

@@ -44,5 +44,19 @@ class Stationmodel(models.Model):
         class Meta:
             db_table='t_stations'
 
+class Cyclemodel(models.Model):
+        id=models.AutoField(primary_key=True,unique=True)
+        cycle_code=models.CharField(max_length=10)
+        operator_id=models.IntegerField(null=True)
+        station_id=models.IntegerField()
+        category=models.CharField(max_length=15)
+        is_charging=models.CharField(max_length=10)
+        battery_percentage=models.FloatField()
+        model_number=models.CharField(max_length=15)
+        status=models.CharField(max_length=10)
+
+        class Meta:
+             db_table='t_cycles'
+
 
 

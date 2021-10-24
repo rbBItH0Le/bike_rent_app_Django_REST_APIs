@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from cycles.models import Cyclemodel
+from operators.models import Cyclemodel
 
 class Cycserialize(serializers.ModelSerializer):
     class Meta:
