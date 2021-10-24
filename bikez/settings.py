@@ -88,14 +88,14 @@ WSGI_APPLICATION = 'bikez.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME':'bikez',
-        'USER':'root',
-        'PASSWORD':'BikeEZ',
-        'HOST':'34.88.117.123',
-        'PORT':'3306',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME':'bikeez',
+        'USER':'postgres',
+        'PASSWORD':'adminroot123',
+        'HOST':'localhost',
+        'PORT':'5432',
         'OPTIONS':{
-            'init_command':"SET sql_mode='STRICT_TRANS_TABLES'",
+            #'init_command':"SET sql_mode='STRICT_TRANS_TABLES'",
         }
     }
 }
