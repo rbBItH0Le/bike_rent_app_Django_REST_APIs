@@ -58,5 +58,13 @@ class Cyclemodel(models.Model):
         class Meta:
              db_table='t_cycles'
 
+class Errormodel(models.Model):
+        error_code=models.IntegerField(primary_key=True)
+        status=models.CharField(max_length=50)
+        error_message=models.CharField(max_length=50,null=True)
+
+        class Meta:
+             db_table='t_errors'
+
 
 

@@ -10,5 +10,6 @@ urlpatterns= [
     path("showstation",views.showstation,name="addstation"),
     path("addcycles",views.addcycles,name="addcycles"),
     path("deletecycle",views.deletecycle,name="deletecycle"),
-    path("movecycle",views.movecycle,name="movecycle")
+    path("movecycle",views.movecycle,name="movecycle"),
+    path("showcycle",views.showcycle,name="showcycle")
 ]
