@@ -10,7 +10,7 @@ from rest_framework.authtoken.models import Token
 
 
 class Customodel(models.Model):
-    id=models.IntegerField(primary_key=True,unique=True)
+    id=models.AutoField(primary_key=True,unique=True)
     first_name=models.CharField(max_length=50)
     last_name=models.CharField(max_length=50)
     email=models.CharField(max_length=50)
@@ -20,15 +20,15 @@ class Customodel(models.Model):
     security_question=models.CharField(max_length=150)
     security_answer=models.CharField(max_length=100)
     favorite_station_id=models.IntegerField()
-    active_trip_id=models.IntegerField()
-    email_verified=models.IntegerField()
-    session_id=models.IntegerField()
+    active_trip_id=models.IntegerField(null=True)
+    email_verified=models.CharField(max_length=10,null=True)
+    session_id=models.IntegerField(null=True)
 
     class Meta:
         db_table='t_customers'
 
 class Custsessionmodel(models.Model):
-    id=models.IntegerField(primary_key=True)
+    id=models.AutoField(primary_key=True)
     customer_id=models.IntegerField()
     access_token=models.CharField(max_length=200)
 
