@@ -5,8 +5,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
-from operators.models import Cyclemodel, Errormodel
-from operators.serialization import AddCycleSerializers, AddstatSerializers, Cyclenalize, Empserialize, Erroralize, LoginSerializers, Sesserialize, ShowCycleSerializers, ShowstatSerializers, Stationalize,FiltersSerializers
+from operators.models import Cyclemodel, Errormodel, Statusmodel
+from operators.serialization import AddCycleSerializers, AddstatSerializers, Cyclenalize, Empserialize, Erroralize, LoginSerializers, Sesserialize, ShowCycleSerializers, ShowCycleStatusSerializers, ShowstatSerializers, Stationalize,FiltersSerializers
 from operators.models import Operatormodel,Operatsessionmodel,Stationmodel
 from django.core import serializers
 from django.http import HttpResponse
@@ -159,4 +159,14 @@ def movecycle(request):
         filters['response']=results
         filters['status']=error
         serialize=AddCycleSerializers(filters)
+        return Response(serialize.data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def showstatus(request):
+    if request.method=='GET':
+        stat=Statusmodel.objects.all()
+        filters={}
+        filters['response']=stat
+        filters['status']=Errormodel.objects.get(error_code=0)
+        serialize=ShowCycleStatusSerializers(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
