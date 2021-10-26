@@ -31,8 +31,7 @@ class Operatsessionmodel(models.Model):
 
 
 class Stationmodel(models.Model):
-        id=models.AutoField(primary_key=True)
-        operator_id=models.IntegerField(null=True)
+        station_id=models.AutoField(primary_key=True)
         capacity=models.IntegerField()
         availability=models.IntegerField()
         address=models.CharField(max_length=200)
@@ -45,15 +44,13 @@ class Stationmodel(models.Model):
             db_table='t_stations'
 
 class Cyclemodel(models.Model):
-        id=models.AutoField(primary_key=True,unique=True)
-        cycle_code=models.CharField(max_length=10)
-        operator_id=models.IntegerField(null=True)
+        cycle_id=models.AutoField(primary_key=True,unique=True)
         station_id=models.IntegerField()
         category=models.CharField(max_length=15)
         is_charging=models.CharField(max_length=10)
         battery_percentage=models.FloatField()
         model_number=models.CharField(max_length=15)
-        status=models.CharField(max_length=10)
+        status_id=models.IntegerField()
 
         class Meta:
              db_table='t_cycles'
@@ -65,6 +62,13 @@ class Errormodel(models.Model):
 
         class Meta:
              db_table='t_errors'
+
+class Statusmodel(models.Model):
+        status_id=models.AutoField(primary_key=True)
+        status=models.CharField(max_length=15)
+
+        class Meta:
+             db_table='t_repair_status'
 
 
 

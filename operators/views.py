@@ -85,14 +85,8 @@ def details(request):
 
 @api_view(['POST'])
 def addstation(request):
-    access=request.POST['access_token']
     if request.method=='POST':
-        if Operatsessionmodel.objects.filter(access_token=access).exists()==False:
-            error=Errormodel.objects.get(error_code=1)
-            serialize=Erroralize(error)
-            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        oper=Operatsessionmodel.objects.get(access_token=access).operator_id
-        station=Stationmodel.objects.create(operator_id=oper,capacity=request.POST['capacity'],availability=request.POST['availability'],address=request.POST['address'],post_code=request.POST['post_code'],location_lat=request.POST['location_lat'],location_long=request.POST['location_long'],serialised_plan=request.POST['serialised_plan'])
+        station=Stationmodel.objects.create(capacity=request.POST['capacity'],availability=request.POST['availability'],address=request.POST['address'],post_code=request.POST['post_code'],location_lat=request.POST['location_lat'],location_long=request.POST['location_long'],serialised_plan=request.POST['serialised_plan'])
         error=Errormodel.objects.get(error_code=0)
         filters={}
         filters['response']=station
@@ -101,9 +95,9 @@ def addstation(request):
         return Response(serialize.data,status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def showstation(request):
-    if request.method=='POST':
+    if request.method=='GET':
         stations=Stationmodel.objects.all()
         filters={}
         filters['response']=stations
@@ -111,9 +105,9 @@ def showstation(request):
         serialize=ShowstatSerializers(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
 
-@api_view(['POST'])
+@api_view(['GET'])
 def showcycle(request):
-    if request.method=='POST':
+    if request.method=='GET':
         cycles=Cyclemodel.objects.all()
         filters={}
         filters['response']=cycles
@@ -124,15 +118,8 @@ def showcycle(request):
 
 @api_view(['POST'])
 def addcycles(request):
-    access=request.POST['access_token']
     if request.method=='POST':
-        if Operatsessionmodel.objects.filter(access_token=access).exists()==False:
-            error=Errormodel.objects.get(error_code=1)
-            serialize=Erroralize(error)
-            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        oper=Operatsessionmodel.objects.get(access_token=access).operator_id
-        print('oper')
-        cycles=Cyclemodel.objects.create(cycle_code=request.POST['cycle_code'],operator_id=oper,station_id=request.POST['station_id'],category=request.POST['category'],is_charging=request.POST['is_charging'],battery_percentage=request.POST['battery_percentage'],model_number=request.POST['model_number'],status=request.POST['status'])
+        cycles=Cyclemodel.objects.create(station_id=request.POST['station_id'],category=request.POST['category'],is_charging=request.POST['is_charging'],battery_percentage=request.POST['battery_percentage'],model_number=request.POST['model_number'],status_id=request.POST['status_id'])
         error=Errormodel.objects.get(error_code=0)
         filters={}
         filters['response']=cycles
@@ -142,17 +129,12 @@ def addcycles(request):
 
 @api_view(['DELETE'])
 def deletecycle(request):
-    access=request.POST['access_token']
     if request.method=='DELETE':
-        if Operatsessionmodel.objects.filter(access_token=access).exists()==False:
-            error=Errormodel.objects.get(error_code=1)
-            serialize=Erroralize(error)
-            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        if Cyclemodel.objects.filter(id=request.POST['id']).exists()==False:
+        if Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).exists()==False:
             error=Errormodel.objects.get(error_code=3)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_404_NOT_FOUND)
-        Cyclemodel.objects.get(id=request.POST['id']).delete()
+        Cyclemodel.objects.get(cycle_id=request.POST['cycle_id']).delete()
         error=Errormodel.objects.get(error_code=0)
         serialize=Erroralize(error)
         return Response(serialize.data,status=status.HTTP_200_OK)
@@ -160,20 +142,18 @@ def deletecycle(request):
 
 @api_view(['PUT'])
 def movecycle(request):
-    access=request.POST['access_token']
     if request.method=='PUT':
-        if Operatsessionmodel.objects.filter(access_token=access).exists()==False:
-            error=Errormodel.objects.get(error_code=1)
-            serialize=Erroralize(error)
-            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        if Cyclemodel.objects.filter(id=request.POST['id']).exists()==False:
+        if Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).exists()==False:
             error=Errormodel.objects.get(error_code=3)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_404_NOT_FOUND)
-        Cyclemodel.objects.filter(id=request.POST['id']).update(station_id=request.POST['station_id'])
-        Cyclemodel.objects.filter(id=request.POST['id']).update(cycle_code=request.POST['cycle_code'])
-        Cyclemodel.objects.filter(id=request.POST['id']).update(model_number=request.POST['model_number'])
-        results=Cyclemodel.objects.get(pk=request.POST['id'])
+        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(station_id=request.POST['station_id'])
+        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(category=request.POST['category'])
+        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(is_charging=request.POST['is_charging'])
+        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(battery_percentage=request.POST['battery_percentage'])
+        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(model_number=request.POST['model_number'])
+        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(status_id=request.POST['status_id'])
+        results=Cyclemodel.objects.get(pk=request.POST['cycle_id'])
         error=Errormodel.objects.get(error_code=0)
         filters={}
         filters['response']=results
