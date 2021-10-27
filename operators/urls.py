@@ -12,5 +12,6 @@ urlpatterns= [
     path("deletecycle",views.deletecycle,name="deletecycle"),
     path("movecycle",views.movecycle,name="movecycle"),
     path("showcycle",views.showcycle,name="showcycle"),
-    path("showstatus",views.showstatus,name="showstatus")
+    path("showstatus",views.showstatus,name="showstatus"),
+    path("repair",views.repair,name="repair")
 ]

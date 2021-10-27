@@ -94,6 +94,16 @@ def addstation(request):
         serialize=AddstatSerializers(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def repair(request):
+    if request.method=='GET':
+        cycles=Cyclemodel.objects.filter(status_id=1)
+        filters={}
+        filters['response']=cycles
+        filters['status']=Errormodel.objects.get(error_code=0)
+        serialize=ShowCycleSerializers(filters)
+        return Response(serialize.data,status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def showstation(request):
