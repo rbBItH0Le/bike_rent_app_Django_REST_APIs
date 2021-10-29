@@ -26,23 +26,11 @@ def track(request):
     date=datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     message='Clock in server in live real time is'
     return Response(data=message+date,status=status.HTTP_200_OK)
-
-@api_view(['PUT'])
-def repair(request):
-    try:
-        Cyclemodel.objects.filter(status='Damaged').update(status='Available')
-    except Cyclemodel.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'PUT':
-        data={}
-        data["MESSAGE"]="ALL BIKES HAVE BEEN REPAIRED"
-        return Response(data)
     
 
-@api_view(['PUT'])
+@api_view(['POST'])
 def move(request):
-    if request.method=='PUT':
+    if request.method=='POST':
         if Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).exists()==False:
             error=Errormodel.objects.get(error_code=3)
             serialize=Erroralize(error)
