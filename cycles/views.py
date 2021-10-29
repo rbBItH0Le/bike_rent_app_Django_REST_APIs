@@ -47,10 +47,6 @@ def move(request):
             error=Errormodel.objects.get(error_code=3)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_404_NOT_FOUND)   
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(category=request.POST['category'])
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(is_charging=request.POST['is_charging'])
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(battery_percentage=request.POST['battery_percentage'])
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(status_id=request.POST['status_id'])
         capacity=Stationmodel.objects.get(station_id=request.POST['station_id']).capacity
         if(capacity<1):
             error=Errormodel.objects.get(error_code=9)
