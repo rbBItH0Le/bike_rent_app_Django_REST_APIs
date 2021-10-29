@@ -43,17 +43,6 @@ class Stationmodel(models.Model):
         class Meta:
             db_table='t_stations'
 
-class Cyclemodel(models.Model):
-        cycle_id=models.AutoField(primary_key=True,unique=True)
-        station_id=models.IntegerField()
-        category=models.CharField(max_length=15)
-        is_charging=models.CharField(max_length=10)
-        battery_percentage=models.FloatField()
-        model_number=models.CharField(max_length=15)
-        status_id=models.IntegerField()
-
-        class Meta:
-             db_table='t_cycles'
 
 class Errormodel(models.Model):
         error_code=models.IntegerField(primary_key=True)

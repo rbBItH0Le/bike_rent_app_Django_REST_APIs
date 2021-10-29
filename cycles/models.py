@@ -34,3 +34,15 @@ class Activetripmodel(models.Model):
 
     class Meta:
         db_table='t_active_trips'
+
+class Cyclemodel(models.Model):
+        cycle_id=models.AutoField(primary_key=True,unique=True)
+        station_id=models.IntegerField()
+        category=models.CharField(max_length=15)
+        is_charging=models.CharField(max_length=10,null=True)
+        battery_percentage=models.CharField(max_length=10,null=True)
+        model_number=models.CharField(max_length=15,null=True)
+        status_id=models.IntegerField(null=True)
+
+        class Meta:
+             db_table='t_cycles'

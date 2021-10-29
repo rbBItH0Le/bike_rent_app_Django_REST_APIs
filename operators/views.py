@@ -5,8 +5,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
-from operators.models import Cyclemodel, Errormodel, Statusmodel
-from operators.serialization import AddCycleSerializers, AddstatSerializers, Cyclenalize, Empserialize, Erroralize, LoginSerializers, Sesserialize, ShowCycleSerializers, ShowCycleStatusSerializers, ShowstatSerializers, Stationalize,FiltersSerializers
+from cycles.models import Cyclemodel
+from operators.models import Statusmodel,Errormodel
+from operators.serialization import AddCycleSerializers, AddstatSerializers, Cyclenalize, Empserialize, Erroralize, LoginSerializers, Sesserialize, ShowCycleStatusSerializers, ShowstatSerializers, Stationalize,FiltersSerializers
 from operators.models import Operatormodel,Operatsessionmodel,Stationmodel
 from django.core import serializers
 from django.http import HttpResponse
@@ -95,17 +96,6 @@ def addstation(request):
         return Response(serialize.data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-def repair(request):
-    if request.method=='GET':
-        cycles=Cyclemodel.objects.filter(status_id=1)
-        filters={}
-        filters['response']=cycles
-        filters['status']=Errormodel.objects.get(error_code=0)
-        serialize=ShowCycleSerializers(filters)
-        return Response(serialize.data,status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
 def showstation(request):
     if request.method=='GET':
         stations=Stationmodel.objects.all()
@@ -115,61 +105,6 @@ def showstation(request):
         serialize=ShowstatSerializers(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
 
-@api_view(['GET'])
-def showcycle(request):
-    if request.method=='GET':
-        cycles=Cyclemodel.objects.all()
-        filters={}
-        filters['response']=cycles
-        filters['status']=Errormodel.objects.get(error_code=0)
-        serialize=ShowCycleSerializers(filters)
-        return Response(serialize.data,status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def addcycles(request):
-    if request.method=='POST':
-        cycles=Cyclemodel.objects.create(station_id=request.POST['station_id'],category=request.POST['category'],is_charging=request.POST['is_charging'],battery_percentage=request.POST['battery_percentage'],model_number=request.POST['model_number'],status_id=request.POST['status_id'])
-        error=Errormodel.objects.get(error_code=0)
-        filters={}
-        filters['response']=cycles
-        filters['status']=error
-        serialize=AddCycleSerializers(filters)
-        return Response(serialize.data,status=status.HTTP_200_OK)
-
-@api_view(['DELETE'])
-def deletecycle(request):
-    if request.method=='DELETE':
-        if Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).exists()==False:
-            error=Errormodel.objects.get(error_code=3)
-            serialize=Erroralize(error)
-            return Response(serialize.data,status=status.HTTP_404_NOT_FOUND)
-        Cyclemodel.objects.get(cycle_id=request.POST['cycle_id']).delete()
-        error=Errormodel.objects.get(error_code=0)
-        serialize=Erroralize(error)
-        return Response(serialize.data,status=status.HTTP_200_OK)
-
-
-@api_view(['PUT'])
-def movecycle(request):
-    if request.method=='PUT':
-        if Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).exists()==False:
-            error=Errormodel.objects.get(error_code=3)
-            serialize=Erroralize(error)
-            return Response(serialize.data,status=status.HTTP_404_NOT_FOUND)
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(station_id=request.POST['station_id'])
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(category=request.POST['category'])
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(is_charging=request.POST['is_charging'])
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(battery_percentage=request.POST['battery_percentage'])
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(model_number=request.POST['model_number'])
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(status_id=request.POST['status_id'])
-        results=Cyclemodel.objects.get(pk=request.POST['cycle_id'])
-        error=Errormodel.objects.get(error_code=0)
-        filters={}
-        filters['response']=results
-        filters['status']=error
-        serialize=AddCycleSerializers(filters)
-        return Response(serialize.data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def showstatus(request):

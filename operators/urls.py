@@ -8,10 +8,5 @@ urlpatterns= [
     path("details",views.details,name="details"),
     path("addstation",views.addstation,name="addstation"),
     path("showstation",views.showstation,name="showstation"),
-    path("addcycles",views.addcycles,name="addcycles"),
-    path("deletecycle",views.deletecycle,name="deletecycle"),
-    path("movecycle",views.movecycle,name="movecycle"),
-    path("showcycle",views.showcycle,name="showcycle"),
-    path("showstatus",views.showstatus,name="showstatus"),
-    path("repair",views.repair,name="repair")
+    path("showstatus",views.showstatus,name="showstatus")
 ]

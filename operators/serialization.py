@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from operators.models import Cyclemodel, Errormodel, Statusmodel
+from cycles.models import Cyclemodel
+from operators.models import Errormodel, Statusmodel
 from operators.models import Operatormodel,Operatsessionmodel, Stationmodel
 
 class Empserialize(serializers.ModelSerializer):
@@ -50,10 +51,6 @@ class ShowstatSerializers(serializers.Serializer):
    
 class AddCycleSerializers(serializers.Serializer):
     response = Cyclenalize()
-    status = Erroralize()
-
-class ShowCycleSerializers(serializers.Serializer):
-    response = Cyclenalize(many=True)
     status = Erroralize()
 
 class ShowCycleStatusSerializers(serializers.Serializer):
