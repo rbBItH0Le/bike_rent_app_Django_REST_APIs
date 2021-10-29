@@ -117,3 +117,14 @@ def repair(request):
         filters['status']=Errormodel.objects.get(error_code=0)
         serialize=ShowCycleSerializers(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def repairstatus(request):
+    if request.method=='POST':
+        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(status_id=0)
+        filters={}
+        filters['response']=Cyclemodel.objects.get(cycle_id=request.POST['cycle_id'])
+        filters['status']=Errormodel.objects.get(error_code=0)
+        serialize=AddCycleSerializers(filters)
+        return Response(serialize.data,status=status.HTTP_200_OK)

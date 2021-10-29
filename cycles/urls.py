@@ -6,6 +6,7 @@ urlpatterns= [
     path("details",views.details,name="details"),
     path("track",views.track,name="track"),
     path("repair",views.repair,name="repair"),
+    path("repairstatus",views.repairstatus,name="repairstatus"),
     path("move",views.move,name="move"),
     path("add",views.add,name="add"),
     path("delete",views.delete,name="delete"),
