@@ -10,21 +10,19 @@ from rest_framework.authtoken.models import Token
 
 
 class Cyclemodel(models.Model):
-    id=models.IntegerField(primary_key=True,unique=True)
-    cycle_code=models.CharField(max_length=10)
-    operator_id=models.IntegerField()
-    hub_id=models.IntegerField()
+    cycle_id=models.AutoField(primary_key=True)
+    station_id=models.IntegerField()
     category=models.CharField(max_length=15)
-    is_charging=models.BooleanField()
-    battery_percentage=models.FloatField()
-    model_number=models.CharField(max_length=15)
-    status=models.CharField(max_length=10)
-
+    is_charging=models.CharField(max_length=10,null=True)
+    battery_percentage=models.CharField(max_length=10,null=True)
+    model_number=models.CharField(max_length=15,null=True)
+    status_id=models.IntegerField(null=True)
+        
     class Meta:
         db_table='t_cycles'
 
 class Tripmodel(models.Model):
-    id=models.IntegerField(primary_key=True,unique=True)
+    rip_id=models.AutoField(primary_key=True,unique=True)
     customer_id=models.IntegerField()
     cycle_id=models.IntegerField()
     station_id=models.IntegerField()
@@ -32,12 +30,15 @@ class Tripmodel(models.Model):
     post_code=models.CharField(max_length=15)
     location_lat=models.FloatField()
     location_long=models.FloatField()
+    started_at=models.BigIntegerField(null=True)
+    ended_at=models.BigIntegerField(null=True)
+    charge=models.IntegerField(null=True)
 
     class Meta:
         db_table='t_trips'
 
 class Activetripmodel(models.Model):
-    id=models.IntegerField(primary_key=True,unique=True)
+    active_trip_id=models.AutoField(primary_key=True,unique=True)
     customer_id=models.IntegerField()
     cycle_id=models.IntegerField()
     station_id=models.IntegerField()
@@ -45,6 +46,8 @@ class Activetripmodel(models.Model):
     post_code=models.CharField(max_length=15)
     location_lat=models.FloatField()
     location_long=models.FloatField()
+    started_at=models.BigIntegerField(null=True)
+    ended_at=models.BigIntegerField(null=True)
 
     class Meta:
         db_table='t_active_trips'

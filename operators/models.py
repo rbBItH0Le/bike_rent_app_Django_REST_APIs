@@ -10,20 +10,20 @@ from rest_framework.authtoken.models import Token
 
 
 class Operatormodel(models.Model):
-    id=models.IntegerField(primary_key=True,unique=True)
+    id=models.AutoField(primary_key=True,unique=True)
     first_name=models.CharField(max_length=50)
     last_name=models.CharField(max_length=50)
     email=models.CharField(max_length=50)
     hashed_password=models.CharField(max_length=100)
     phone=models.CharField(max_length=15)
-    session_id=models.IntegerField()
+    session_id=models.IntegerField(null=True)
 
     class Meta:
         db_table='t_operators'
 
 class Operatsessionmodel(models.Model):
         id=models.AutoField(primary_key=True)
-        customer_id=models.IntegerField()
+        operator_id=models.IntegerField()
         access_token=models.CharField(max_length=200)
 
         class Meta:
@@ -31,8 +31,7 @@ class Operatsessionmodel(models.Model):
 
 
 class Stationmodel(models.Model):
-        id=models.IntegerField(primary_key=True)
-        operator_id=models.IntegerField()
+        station_id=models.AutoField(primary_key=True)
         capacity=models.IntegerField()
         availability=models.IntegerField()
         address=models.CharField(max_length=200)
@@ -43,6 +42,24 @@ class Stationmodel(models.Model):
 
         class Meta:
             db_table='t_stations'
+
+
+class Errormodel(models.Model):
+        error_code=models.IntegerField(primary_key=True)
+        status=models.CharField(max_length=50)
+        error_message=models.CharField(max_length=50,null=True)
+
+        class Meta:
+             db_table='t_errors'
+
+class Statusmodel(models.Model):
+        status_id=models.AutoField(primary_key=True)
+        status=models.CharField(max_length=15)
+
+        class Meta:
+             db_table='t_repair_status'
+
+
 
 
 

@@ -5,60 +5,113 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
-from operators.serialization import Empserialize, Sesserialize
-from operators.models import Operatormodel, Operatsessionmodel
+from cycles.models import Cyclemodel
+from operators.models import Statusmodel,Errormodel
+from operators.serialization import AddCycleSerializers, AddstatSerializers, Cyclenalize, Empserialize, Erroralize, LoginSerializers, Sesserialize, ShowCycleStatusSerializers, ShowstatSerializers, Stationalize,FiltersSerializers
+from operators.models import Operatormodel,Operatsessionmodel,Stationmodel
+from django.core import serializers
+from django.http import HttpResponse
 import random
 import base64
 import hashlib
 import requests
+import json
+
 
 @api_view(['POST'])
 def login(request):
-    userna=request.POST['id']
-    passso=request.POST['hashed_password']
-    access_token=str(Operatsessionmodel.objects.filter(customer_id=userna).values_list('access_token', flat=True))
-    emailo=str(Operatormodel.objects.filter(pk=userna).values_list('email', flat=True))
-    emailo=emailo[12:-3]
-    access_token=access_token[12:-3]
-    sam=emailo+'-'+passso
-    message_bytes = sam.encode('ascii')
-    base64_bytes = str(base64.b64encode(message_bytes))
-    if(access_token and access_token==base64_bytes):
-        return Response(data='Successfully logged in',status=status.HTTP_200_OK)
-    return Response(data='Cannot be Authenticated',status=status.HTTP_401_UNAUTHORIZED)
-
-
+    if request.method=='POST':
+        if Operatormodel.objects.filter(email=request.POST['email']).exists()==False:
+            error=Errormodel.objects.get(error_code=4)
+            serialize=Erroralize(error)
+            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
+        if Operatormodel.objects.get(email=request.POST['email']).session_id!=None:
+            error=Errormodel.objects.get(error_code=5)
+            serialize=Erroralize(error)
+            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)     
+        passo=request.POST['hashed_password']
+        passcheck=Operatormodel.objects.get(email=request.POST['email']).hashed_password
+        ido=Operatormodel.objects.get(email=request.POST['email'])
+        ido=ido.id
+        passo_bytes = passo.encode('ascii')
+        passo_bytes = base64.b64encode(passo_bytes)
+        passo_bytes=str(passo_bytes)
+        if(passcheck==passo_bytes):
+            sam=str(request.POST['email']+request.POST['hashed_password'])
+            message_bytes = sam.encode('ascii')
+            base64_bytes = base64.b64encode(message_bytes)
+            operate_session=Operatsessionmodel.objects.create(operator_id=ido,access_token=base64_bytes)
+            Operatormodel.objects.filter(email=request.POST['email']).update(session_id=operate_session.id)
+            filters={}
+            filters['response']=operate_session
+            filters['status']=Errormodel.objects.get(error_code=0)
+            serialize=LoginSerializers(filters)
+            return Response(serialize.data,status=status.HTTP_200_OK)
+        error=Errormodel.objects.get(error_code=1)
+        serialize=Erroralize(error)
+        return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-def logout(request):
-    date=datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    message='Clock in server in live real time is'
-    return Response(data=message+date,status=status.HTTP_200_OK)
+def logout(request): 
+    if request.method=='POST':
+        if Operatormodel.objects.filter(email=request.POST['email']).exists()==False:
+            error=Errormodel.objects.get(error_code=4)
+            serialize=Erroralize(error)
+            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
+        if Operatsessionmodel.objects.filter(access_token=request.POST['access_token']).exists()==False:
+            error=Errormodel.objects.get(error_code=6)
+            serialize=Erroralize(error)
+            return Response(serialize.data,status=status.HTTP_404_NOT_FOUND)
+        access=Operatsessionmodel.objects.get(access_token=request.POST['access_token']).access_token
+        print(access)
+        ido=Operatormodel.objects.get(id=Operatsessionmodel.objects.get(access_token=access).operator_id).id
+        print(ido)
+        Operatsessionmodel.objects.get(access_token=access).delete()
+        Operatormodel.objects.filter(id=ido).update(session_id=None)
+        error=Errormodel.objects.get(error_code=0)
+        serialize=Erroralize(error)
+        return Response(serialize.data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def details(request):
     id=request.POST['id']
     if request.method=='POST':
+        filters={}
         results=Operatormodel.objects.get(pk=id)
-        serialize=Empserialize(results)
+        errors=Errormodel.objects.get(error_code=0)
+        filters['response']=results
+        filters['status']=errors
+        serialize=FiltersSerializers(filters)
         return Response(serialize.data)
 
-
 @api_view(['POST'])
-def register(request):
-    operat=Operatormodel()
+def addstation(request):
     if request.method=='POST':
-        serialize=Empserialize(operat,request.data)
-        emailo=str(request.POST['email'])
-        custo=int(request.POST['id'])
-        passo=str(request.POST['hashed_password'])
-        sam=emailo+'-'+passo
-        message_bytes = sam.encode('ascii')
-        base64_bytes = base64.b64encode(message_bytes)
-        operator_session=Operatsessionmodel.objects.create(customer_id=custo,access_token=base64_bytes)
-        if serialize.is_valid():
-            serialize.save()
-            return Response(serialize.data,status=status.HTTP_201_CREATED)
-        return Response(serialize.errors,status=status.HTTP_400_BAD_REQUEST)
+        station=Stationmodel.objects.create(capacity=request.POST['capacity'],availability=request.POST['availability'],address=request.POST['address'],post_code=request.POST['post_code'],location_lat=request.POST['location_lat'],location_long=request.POST['location_long'],serialised_plan=request.POST['serialised_plan'])
+        error=Errormodel.objects.get(error_code=0)
+        filters={}
+        filters['response']=station
+        filters['status']=error
+        serialize=AddstatSerializers(filters)
+        return Response(serialize.data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def showstation(request):
+    if request.method=='GET':
+        stations=Stationmodel.objects.all()
+        filters={}
+        filters['response']=stations
+        filters['status']=Errormodel.objects.get(error_code=0)
+        serialize=ShowstatSerializers(filters)
+        return Response(serialize.data,status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+def showstatus(request):
+    if request.method=='GET':
+        stat=Statusmodel.objects.all()
+        filters={}
+        filters['response']=stat
+        filters['status']=Errormodel.objects.get(error_code=0)
+        serialize=ShowCycleStatusSerializers(filters)
+        return Response(serialize.data,status=status.HTTP_200_OK)
