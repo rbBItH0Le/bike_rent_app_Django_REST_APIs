@@ -17,11 +17,15 @@ import time
 
 
 @api_view(['POST'])
-def details(request):
+def activetripdetails(request):
     if request.method=='POST':
-        pk=request.POST['pk']
-        results=Cyclemodel.objects.get(pk=pk)
-        serialize=Cyclenalize(results)
+        pk=request.POST['cycle_id']
+        results=Activetripmodel.objects.get(cycle_id=pk)
+        erroro=Errormodel.objects.get(error_code=0)
+        filters={}
+        filters['response']=results
+        filters['status']=erroro
+        serialize=Renterializers(results)
         return Response(serialize.data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
