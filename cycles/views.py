@@ -5,13 +5,14 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from cycles.models import Cyclemodel
+from cycles.models import Cyclemodel,Activetripmodel
 from customers.models import Customodel,Custsessionmodel
-from cycles.serialization import Cyclenalize,AddCycleSerializers,ShowCycleSerializers, Showgeorializers
+from cycles.serialization import Cyclenalize,AddCycleSerializers,ShowCycleSerializers, Showgeorializers,Renterializers
 from operators.serialization import Erroralize
 from operators.models import Statusmodel,Stationmodel,Errormodel
 from datetime import datetime
 import random
+import time
 
 
 @api_view(['POST'])
@@ -180,5 +181,22 @@ def rent(request):
             error=Errormodel.objects.get(error_code=3)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
+        custo=Customodel.objects.get(id=request.POST['id']).id
+        cycl=Cyclemodel.objects.get(cycle_id=request.POST['cycle_id']).cycle_id
+        stato=Cyclemodel.objects.get(cycle_id=request.POST['cycle_id']).station_id
+        addr=Stationmodel.objects.get(station_id=stato).address
+        posc=Stationmodel.objects.get(station_id=stato).post_code
+        locla=Stationmodel.objects.get(station_id=stato).location_lat
+        loclo=Stationmodel.objects.get(station_id=stato).location_long
+        started=int(round(time.time() * 1000))
+        activa=Activetripmodel.objects.create(customer_id=custo,cycle_id=cycl,station_id=stato,address=addr,post_code=posc,location_lat=locla,location_long=loclo,started_at=started)
+        vb=Activetripmodel.objects.get(cycle_id=cycl).active_trip_id
+        Cyclemodel.objects.filter(cycle_id=cycl).update(status_id=3)
+        Customodel.objects.filter(id=custo).update(active_trip_id=vb)
+        filters={}
+        filters['response']=activa
+        filters['status']=Errormodel.objects.get(error_code=0)
+        serialize=Renterializers(filters)
+        return Response(serialize.data,status=status.HTTP_200_OK)
 
         
