@@ -81,25 +81,6 @@ def signup(request):
         return Response(serialize.data,status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
-def returns(request):
-    date=datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    message='Clock in server in live real time is'
-    return Response(data=message+date,status=status.HTTP_200_OK)
-
-@api_view(['POST'])
-def pay(request):
-    paying=Paymentmodel()
-    date=datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    paying.transaction_time=date
-    if request.method=='POST':
-        serialize=Payerialize(paying,request.data)
-        data={}
-        if serialize.is_valid():
-            serialize.save()
-            data['Message']='Payment Successful'
-            return Response(data,status=status.HTTP_200_OK)
-        return Response(serialize.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
 

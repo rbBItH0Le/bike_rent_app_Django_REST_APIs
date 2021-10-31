@@ -12,5 +12,7 @@ urlpatterns= [
     path("delete",views.delete,name="delete"),
     path("show",views.show,name="show"),
     path("report",views.report,name="report"),
-    path("rent",views.rent,name="rent")
+    path("rent",views.rent,name="rent"),
+    path("returno",views.returno,name="returno"),
+    path("showactive",views.showactive,name="showactive")
 ]

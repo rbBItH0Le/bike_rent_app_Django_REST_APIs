@@ -22,6 +22,7 @@ class Customodel(models.Model):
     favorite_station_id=models.IntegerField()
     active_trip_id=models.IntegerField(null=True)
     email_verified=models.CharField(max_length=10,null=True)
+    credits=models.IntegerField(default=10)
     session_id=models.IntegerField(null=True)
 
     class Meta:
@@ -37,12 +38,13 @@ class Custsessionmodel(models.Model):
 
 
 class Paymentmodel(models.Model):
-    id=models.IntegerField(primary_key=True)
+    id=models.AutoField(primary_key=True)
     customer_id=models.IntegerField()
+    trip_id=models.IntegerField(null=True)
     transaction_time=models.CharField(max_length=100)
     transaction_id=models.CharField(max_length=50)
-    payment_method=models.CharField(max_length=20)
-    card_number=models.CharField(max_length=15)
+    payment_method=models.CharField(max_length=20,default='credits')
+    card_number=models.CharField(max_length=15,null=True)
 
     class Meta:
         db_table='t_payments'
