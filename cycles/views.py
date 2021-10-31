@@ -25,7 +25,7 @@ def activetripdetails(request):
         filters={}
         filters['response']=results
         filters['status']=erroro
-        serialize=Renterializers(results)
+        serialize=Renterializers(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
