@@ -4,7 +4,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
 from customers.models import Customodel, Custsessionmodel, Paymentmodel
-from operators.models import Errormodel
+from cycles.models import Cyclemodel
+from cycles.serialization import ShowCycleSerializers
+from operators.models import Errormodel, Stationmodel
 from customers.serialization import Custloginalize, Custserialize, Payerialize, Singupalize
 from operators.serialization import Erroralize
 import random,hashlib,base64
@@ -79,6 +81,37 @@ def signup(request):
         filters['status']=error
         serialize=Singupalize(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def shownearest(request):
+    if request.method=='GET':
+        if Customodel.objects.filter(id=request.POST['id']).exists()==False:
+            error=Errormodel.objects.get(error_code=4)
+            serialize=Erroralize(error)
+            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
+        if Custsessionmodel.objects.filter(customer_id=request.POST['id']).exists()==False:
+            error=Errormodel.objects.get(error_code=1)
+            serialize=Erroralize(error)
+            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
+        posc=Customodel.objects.get(id=request.POST['id']).post_code
+        if Stationmodel.objects.filter(post_code=posc).exists()==False:
+            error=Errormodel.objects.get(error_code=12)
+            serialize=Erroralize(error)
+            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
+        station=Stationmodel.objects.get(post_code=posc).station_id
+        if Cyclemodel.objects.filter(station_id=station,status_id=0).exists()==False:
+            error=Errormodel.objects.get(error_code=13)
+            serialize=Erroralize(error)
+            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
+        cycles=Cyclemodel.objects.filter(station_id=station)
+        filters={}
+        filters['response']=cycles
+        filters['status']=Errormodel.objects.get(error_code=0)
+        serialize=ShowCycleSerializers(filters)
+        return Response(serialize.data,status=status.HTTP_200_OK)
+
+
+
 
 
 
