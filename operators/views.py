@@ -98,7 +98,7 @@ def addstation(request):
 @api_view(['GET'])
 def showstation(request):
     if request.method=='GET':
-        stations=Stationmodel.objects.all()
+        stations=Stationmodel.objects.all().order_by('-station_id')
         filters={}
         filters['response']=stations
         filters['status']=Errormodel.objects.get(error_code=0)
