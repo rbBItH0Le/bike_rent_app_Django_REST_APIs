@@ -5,7 +5,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from cycles.models import Cyclemodel,Activetripmodel, Tripmodel
+from cycles.models import Cyclemodel,Activetripmodel, Tripdetailsmodel, Tripmodel
 from customers.models import Customodel,Custsessionmodel
 from cycles.serialization import Cyclenalize,AddCycleSerializers,ShowCycleSerializers, Showgeorializers,Renterializers
 from operators.serialization import Erroralize
@@ -14,6 +14,7 @@ from operators.models import Statusmodel,Stationmodel,Errormodel
 from datetime import datetime
 import random
 import time
+import numpy
 
 
 @api_view(['POST'])
@@ -195,9 +196,21 @@ def rent(request):
         locla=Stationmodel.objects.get(station_id=stato).location_lat
         loclo=Stationmodel.objects.get(station_id=stato).location_long
         started=int(round(time.time() * 1000))
+        avai=Stationmodel.objects.get(station_id=stato).availability
+        avail=avai-1
+        endstato=random.randint(1,6)
+        if endstato==stato:
+            endstato=endstato+1
+        if Stationmodel.objects.filter(station_id=endstato).exists==False:
+            endstato=endstato-1
+        endloc=Stationmodel.objects.get(station_id=endstato).location_lat
+        endlon=Stationmodel.objects.get(station_id=endstato).location_long
+        coordinates=numpy.linspace([locla,loclo],[endloc,endlon],10).tolist()
+        Stationmodel.objects.filter(station_id=stato).update(availability=avail)
         activa=Activetripmodel.objects.create(customer_id=custo,cycle_id=cycl,station_id=stato,address=addr,post_code=posc,location_lat=locla,location_long=loclo,started_at=started,model_number=modelo)
         vb=Activetripmodel.objects.get(cycle_id=cycl).active_trip_id
-        Cyclemodel.objects.filter(cycle_id=cycl).update(status_id=3)
+        Tripdetailsmodel.objects.create(active_trip_id=vb,cycle_id=cycl,customer_id=custo,starting_lat=locla,starting_long=loclo,ending_lat=endloc,ending_long=endlon,coordinates=coordinates)
+        Cyclemodel.objects.filter(cycle_id=cycl).update(status_id=2)
         Customodel.objects.filter(id=custo).update(active_trip_id=vb)
         filters={}
         filters['response']=activa

@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
+from cycles.models import Cyclemodel
 from managers.models import Managermodel,Managessionmodel
 from operators.models import Operatormodel,Errormodel
 from managers.serialization import Loginalize, Managerialize, Managesignalize, Onboardanlize, Operationalize
@@ -115,6 +116,17 @@ def operatoronboard(request):
         filters['status']=error
         serialize=Onboardanlize(filters)
         return Response(serialize.data,status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def showpie(request):
+    if request.method=='GET':
+        available=Cyclemodel.objects.filter(status_id=0).count()
+        damaged=Cyclemodel.objects.filter(status_id=1).count()
+        rented=Cyclemodel.objects.filter(status_id=2).count()
+        data={}
+        data['response']=[available,damaged,rented]
+        data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
+        return Response(data,status=status.HTTP_200_OK)
 
 
 
