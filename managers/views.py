@@ -128,7 +128,16 @@ def showpie(request):
         data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
         return Response(data,status=status.HTTP_200_OK)
 
-
+@api_view(['GET'])
+def showstatbar(request):
+    if request.method=='GET':
+        Byres=Cyclemodel.objects.filter(station_id=0).count()
+        Partik=Cyclemodel.objects.filter(station_id=1).count()
+        Ware=Cyclemodel.objects.filter(station_id=2).count()
+        data={}
+        data['response']=[Byres,Partik,Ware]
+        data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
+        return Response(data,status=status.HTTP_200_OK)
 
 
 
