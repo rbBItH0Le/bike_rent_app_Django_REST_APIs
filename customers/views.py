@@ -92,7 +92,7 @@ def details(request):
             error=Errormodel.objects.get(error_code=0)
             filters['response']=custo
             filters['status']=error
-            serialize=Custserialize(filters)
+            serialize=Singupalize(filters)
             return Response(serialize.data,status=status.HTTP_200_OK)
         except:
             error=Errormodel.objects.get(error_code=4)

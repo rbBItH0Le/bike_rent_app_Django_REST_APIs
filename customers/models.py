@@ -16,7 +16,7 @@ class Customodel(models.Model):
     email=models.CharField(max_length=50)
     hashed_password=models.CharField(max_length=100)
     phone=models.CharField(max_length=15)
-    favorite_station_id=models.IntegerField()
+    favorite_station_id=models.IntegerField(null=True)
     active_trip_id=models.IntegerField(null=True)
     credits=models.IntegerField(default=10)
     session_id=models.IntegerField(null=True)

@@ -86,12 +86,26 @@ WSGI_APPLICATION = 'bikez.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME':'bikeeeez',
+#         'USER':'postgres',
+#         'PASSWORD':'adminroot123',
+#         'HOST':'localhost',
+#         'PORT':'5432',
+#         'OPTIONS':{
+#             #'init_command':"SET sql_mode='STRICT_TRANS_TABLES'",
+#         }
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME':'bikeeeez',
-        'USER':'postgres',
-        'PASSWORD':'adminroot123',
+        'NAME':'postgres',
+        'USER':'harshjain',
+        'PASSWORD':'784159623',
         'HOST':'localhost',
         'PORT':'5432',
         'OPTIONS':{
