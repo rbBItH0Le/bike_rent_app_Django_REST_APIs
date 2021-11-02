@@ -264,7 +264,7 @@ def showactive(request):
             error=Errormodel.objects.get(error_code=10)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_404_NOT_FOUND)
-        cycles=Cyclemodel.objects.filter(status_id=3)
+        cycles=Cyclemodel.objects.filter(status_id=2)
         filters={}
         filters['response']=cycles
         filters['status']=Errormodel.objects.get(error_code=0)

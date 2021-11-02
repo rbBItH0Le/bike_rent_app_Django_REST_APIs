@@ -10,7 +10,7 @@ from rest_framework import status
 from datetime import datetime
 from cycles.models import Cyclemodel
 from managers.models import Managermodel,Managessionmodel
-from operators.models import Operatormodel,Errormodel
+from operators.models import Operatormodel,Errormodel, Stationmodel, Statusmodel
 from managers.serialization import Loginalize, Managerialize, Managesignalize, Onboardanlize, Operationalize
 from operators.serialization import Erroralize
 from cryptography.fernet import Fernet
@@ -120,22 +120,24 @@ def operatoronboard(request):
 @api_view(['GET'])
 def showpie(request):
     if request.method=='GET':
-        available=Cyclemodel.objects.filter(status_id=0).count()
-        damaged=Cyclemodel.objects.filter(status_id=1).count()
-        rented=Cyclemodel.objects.filter(status_id=2).count()
+        soli=[]
+        for i in range(Statusmodel.objects.all().count()):
+            a=Cyclemodel.objects.filter(status_id=i).count()
+            soli.append(a)
         data={}
-        data['response']=[available,damaged,rented]
+        data['response']=soli
         data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
         return Response(data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def showstatbar(request):
     if request.method=='GET':
-        Byres=Cyclemodel.objects.filter(station_id=0).count()
-        Partik=Cyclemodel.objects.filter(station_id=1).count()
-        Ware=Cyclemodel.objects.filter(station_id=2).count()
+        soli=[]
+        for i in range(Stationmodel.objects.all().count()):
+            a=Cyclemodel.objects.filter(station_id=i).count()
+            soli.append(a)
         data={}
-        data['response']=[Byres,Partik,Ware]
+        data['response']=soli
         data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
         return Response(data,status=status.HTTP_200_OK)
 
