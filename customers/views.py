@@ -48,18 +48,17 @@ def login(request):
 @api_view(['POST'])
 def logout(request):
     if request.method=='POST':
-        if Customodel.objects.filter(email=request.POST['email']).exists()==False:
+        customer_id_param=request.POST['customer_id']
+        if Customodel.objects.filter(id=customer_id_param).exists()==False:
             error=Errormodel.objects.get(error_code=4)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        if Custsessionmodel.objects.filter(access_token=request.POST['access_token']).exists()==False:
+        if Custsessionmodel.objects.filter(customer_id=customer_id_param).exists()==False:
             error=Errormodel.objects.get(error_code=6)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        access=Custsessionmodel.objects.get(access_token=request.POST['access_token']).access_token
-        ido=Customodel.objects.get(id=Custsessionmodel.objects.get(access_token=access).customer_id).id
-        Custsessionmodel.objects.get(access_token=access).delete()
-        Customodel.objects.filter(id=ido).update(session_id=None)
+        Custsessionmodel.objects.get(customer_id=customer_id_param).delete()
+        Customodel.objects.filter(id=customer_id_param).update(session_id=None)
         error=Errormodel.objects.get(error_code=0)
         filters={}
         filters['response']=None
