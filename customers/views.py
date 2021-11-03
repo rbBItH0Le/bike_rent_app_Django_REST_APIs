@@ -67,17 +67,22 @@ def logout(request):
 @api_view(['POST'])
 def signup(request):
     if request.method=='POST':
-        if Customodel.objects.filter(email=request.POST['email']).exists():
+        emailParam = request.POST['email']
+        if Customodel.objects.filter(email=emailParam).exists():
             error=Errormodel.objects.get(error_code=7)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        hashed=request.POST['hashed_password']
-        message_bytes = hashed.encode('ascii')
-        base64_bytes = base64.b64encode(message_bytes)
-        custo=Customodel.objects.create(first_name=request.POST['first_name'],last_name=request.POST['last_name'],email=request.POST['email'],hashed_password=base64_bytes,phone=request.POST['phone'])
+        hashed_password=request.POST['hashed_password']
+        hashed_password_bytes = base64.b64encode(hashed_password.encode('ascii'))
+        custo=Customodel.objects.create(first_name=request.POST['first_name'],last_name=request.POST['last_name'],email=request.POST['email'],hashed_password=hashed_password_bytes,phone=request.POST['phone'])
+        customer_id = custo.id
+        accessTokenParams = str(emailParam + hashed_password)
+        accessToken_bytes = base64.b64encode(accessTokenParams.encode('ascii'))
+        cust_session=Custsessionmodel.objects.create(customer_id=customer_id,access_token=accessToken_bytes)
+        Customodel.objects.filter(id = customer_id).update(session_id = cust_session.id)
         error=Errormodel.objects.get(error_code=0)
         filters={}
-        filters['response']=custo
+        filters['response']=Customodel.objects.get(id=customer_id)
         filters['status']=error
         serialize=Singupalize(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
@@ -98,7 +103,7 @@ def details(request):
             error=Errormodel.objects.get(error_code=4)
             filters['response']=None
             filters['status']=error
-            serialize=Custserialize(filters)
+            serialize=Singupalize(filters)
             return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
