@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
 from customers.models import Paymentmodel
-from cycles.models import Cyclemodel
+from cycles.models import Cyclemodel, Tripmodel
 from managers.models import Managermodel,Managessionmodel
 from operators.models import Operatormodel,Errormodel, Stationmodel, Statusmodel
 from managers.serialization import Loginalize, Managerialize, Managesignalize, Onboardanlize, Operationalize
@@ -157,6 +157,19 @@ def showline(request):
             data['response']=soli
             data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
             return Response(data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def tripgraph(request):
+    if request.method=='GET':
+        soli={}
+        for i in range(Stationmodel.objects.all().count()):
+            a=Tripmodel.objects.filter(station_id=i).count()
+            soli[Stationmodel.objects.get(station_id=i).address]=a
+        data={}
+        data['response']=soli
+        data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
+        return Response(data,status=status.HTTP_200_OK)
+
 
 
 @api_view(['GET'])

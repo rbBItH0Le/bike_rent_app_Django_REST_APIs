@@ -12,4 +12,5 @@ urlpatterns= [
     path("showstatbar",views.showstatbar,name="showstatbar"),
     path("showline",views.showline,name="showline"),
     path("showdetail",views.showdetail,name="showdetail"),
+    path("tripgraph",views.tripgraph,name="tripgraph")
 ]
