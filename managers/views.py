@@ -163,7 +163,7 @@ def tripgraph(request):
     if request.method=='GET':
         tripGraphModelList = []
         for station in Stationmodel.objects.all():
-            tripGraphModelList.append(Tripmodel.objects.filter(station_id=station.id).count())
+            tripGraphModelList.append(Tripmodel.objects.filter(station_id=station.station_id).count())
         data={}
         data['response']=tripGraphModelList
         data['status']=None
