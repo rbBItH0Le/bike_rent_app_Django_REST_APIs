@@ -23,7 +23,7 @@ class Cyclemodel(models.Model):
         db_table='t_cycles'
 
 class Tripmodel(models.Model):
-    rip_id=models.AutoField(primary_key=True,unique=True)
+    trip_id=models.AutoField(primary_key=True,unique=True)
     customer_id=models.IntegerField()
     cycle_id=models.IntegerField()
     model_number=models.CharField(max_length=15,null=True)
