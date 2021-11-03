@@ -271,6 +271,19 @@ def showactive(request):
         serialize=ShowCycleSerializers(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
 
-
-
-
+@api_view(['POST'])
+def cyclesforstation(request):
+    if request.method=='POST':
+        filters={}
+        try:
+            station_id_param = request.POST['station_id']
+            cycles=Cyclemodel.objects.filter(station_id=station_id_param)
+            filters['response']=cycles
+            filters['status']=Errormodel.objects.get(error_code=0)
+            serialize=ShowCycleSerializers(filters)
+            return Response(serialize.data,status=status.HTTP_200_OK)
+        except:
+            filters['response']=None
+            filters['status']=Errormodel.objects.get(error_code=13)
+            serialize=ShowCycleSerializers(filters)
+            return Response(serialize.data,status=status.HTTP_404_NOT_FOUND)

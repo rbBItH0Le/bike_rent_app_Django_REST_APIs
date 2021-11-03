@@ -14,5 +14,6 @@ urlpatterns= [
     path("report",views.report,name="report"),
     path("rent",views.rent,name="rent"),
     path("returno",views.returno,name="returno"),
-    path("showactive",views.showactive,name="showactive")
+    path("showactive",views.showactive,name="showactive"),
+    path("for_station",views.cyclesforstation,name="cyclesForStation")
 ]

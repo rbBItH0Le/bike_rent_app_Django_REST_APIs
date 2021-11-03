@@ -61,7 +61,10 @@ def logout(request):
         Custsessionmodel.objects.get(access_token=access).delete()
         Customodel.objects.filter(id=ido).update(session_id=None)
         error=Errormodel.objects.get(error_code=0)
-        serialize=Erroralize(error)
+        filters={}
+        filters['response']=None
+        filters['status']=error
+        serialize=Singupalize(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
