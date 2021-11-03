@@ -8,12 +8,14 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
+from customers.models import Paymentmodel
 from cycles.models import Cyclemodel
 from managers.models import Managermodel,Managessionmodel
 from operators.models import Operatormodel,Errormodel, Stationmodel, Statusmodel
 from managers.serialization import Loginalize, Managerialize, Managesignalize, Onboardanlize, Operationalize
 from operators.serialization import Erroralize
 from cryptography.fernet import Fernet
+from django.db.models import Sum
 import base64
 
 @api_view(['POST'])
@@ -115,7 +117,7 @@ def operatoronboard(request):
         filters['response']=operat
         filters['status']=error
         serialize=Onboardanlize(filters)
-        return Response(serialize.data,status=status.HTTP_400_BAD_REQUEST)
+        return Response(serialize.data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def showpie(request):
@@ -142,4 +144,16 @@ def showstatbar(request):
         return Response(data,status=status.HTTP_200_OK)
 
 
-
+@api_view(['GET'])
+def showline(request):
+    if request.method=='GET':
+            soli=[]
+            for i in range(13):
+                a=Paymentmodel.objects.filter(month=i).aggregate(Sum('charge'))["charge__sum"]
+                if a==None:
+                    a=0
+                soli.append(a)
+            data={}
+            data['response']=soli
+            data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
+            return Response(data,status=status.HTTP_200_OK)

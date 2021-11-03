@@ -9,5 +9,6 @@ urlpatterns= [
     path("logout",views.logout,name="logout"),
     path("addoperator",views.operatoronboard,name="operatoronboard"),
     path("showpie",views.showpie,name="showpie"),
-    path("showstatbar",views.showstatbar,name="showstatbar")
+    path("showstatbar",views.showstatbar,name="showstatbar"),
+    path("showline",views.showline,name="showline")
 ]

@@ -40,6 +40,9 @@ class Paymentmodel(models.Model):
     transaction_time=models.CharField(max_length=100)
     transaction_id=models.CharField(max_length=50)
     payment_method=models.CharField(max_length=20,default='credits')
+    charge=models.IntegerField(null=True)
+    month=models.IntegerField(null=True)
+    year=models.IntegerField(null=True)
     card_number=models.CharField(max_length=15,null=True)
 
     class Meta:
