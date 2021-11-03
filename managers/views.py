@@ -174,8 +174,8 @@ def tripgraph(request):
 @api_view(['GET'])
 def availdamagbar(request):
     if request.method=='GET':
-        avail=[Stationmodel.objects.filter(status_id=0,station_id=i) for i in range(Stationmodel.objects.all().count())]
-        damag=[Stationmodel.objects.filter(status_id=1,station_id=i) for i in range(Stationmodel.objects.all().count())]
+        avail=[Cyclemodel.objects.filter(status_id=0,station_id=i).count() for i in range(Stationmodel.objects.all().count())]
+        damag=[Cyclemodel.objects.filter(status_id=1,station_id=i).count() for i in range(Stationmodel.objects.all().count())]
         data={}
         data['avail']=avail
         data['damag']=damag
