@@ -10,5 +10,6 @@ urlpatterns= [
     path("addoperator",views.operatoronboard,name="operatoronboard"),
     path("showpie",views.showpie,name="showpie"),
     path("showstatbar",views.showstatbar,name="showstatbar"),
-    path("showline",views.showline,name="showline")
+    path("showline",views.showline,name="showline"),
+    path("showdetail",views.showdetail,name="showdetail"),
 ]

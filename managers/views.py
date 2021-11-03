@@ -148,7 +148,7 @@ def showstatbar(request):
 def showline(request):
     if request.method=='GET':
             soli=[]
-            for i in range(13):
+            for i in range(1,13):
                 a=Paymentmodel.objects.filter(month=i).aggregate(Sum('charge'))["charge__sum"]
                 if a==None:
                     a=0
@@ -157,3 +157,18 @@ def showline(request):
             data['response']=soli
             data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
             return Response(data,status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def showdetail(request):
+    if request.method=='GET':
+        if Managermodel.objects.filter(id=request.POST['id'])==False:
+            error=Errormodel.objects.get(error_code=7)
+            serialize=Erroralize(error)
+            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
+        manager=Managermodel.objects.get(id=request.POST['id'])
+        data={}
+        data['response']=manager
+        data['status']=Errormodel.objects.get(error_code=0)
+        serialise=Managesignalize(data)
+        return Response(serialise.data,status=status.HTTP_200_OK)
