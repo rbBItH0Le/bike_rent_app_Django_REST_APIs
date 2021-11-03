@@ -161,15 +161,16 @@ def showline(request):
 @api_view(['GET'])
 def tripgraph(request):
     if request.method=='GET':
-        soli={}
-        for i in range(Stationmodel.objects.all().count()):
-            a=Tripmodel.objects.filter(station_id=i).count()
-            soli[Stationmodel.objects.get(station_id=i).address]=a
+        responseObject={}
+        tripGraphModelList = []
+        for station in Stationmodel.objects.all():
+            station_name_toAdd=station.address
+            number_of_trips=Tripmodel.objects.filter(station_id=station.station_id).count()
+            tripGraphModelList.append(dict(station_name=station_name_toAdd, num_trips=number_of_trips))
         data={}
-        data['response']=soli
-        data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
+        data['response']=tripGraphModelList
+        data['status']=None
         return Response(data,status=status.HTTP_200_OK)
-
 
 
 @api_view(['GET'])
