@@ -54,17 +54,3 @@ class Activetripmodel(models.Model):
 
     class Meta:
         db_table='t_active_trips'
-
-class Tripdetailsmodel(models.Model):
-    trip_detail_id=models.AutoField(primary_key=True)
-    active_trip_id=models.IntegerField(null=True)
-    cycle_id=models.IntegerField()
-    customer_id=models.IntegerField()
-    starting_lat=models.FloatField()
-    starting_long=models.FloatField()
-    ending_lat=models.FloatField()
-    ending_long=models.FloatField()
-    coordinates=ArrayField(ArrayField(models.FloatField()),null=True)
-        
-    class Meta:
-        db_table='t_trip_details'
