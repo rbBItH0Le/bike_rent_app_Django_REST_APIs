@@ -126,5 +126,5 @@ def showviablestation(request):
             if(station.availability != station.capacity):
                 viableStations.append(dict(station_id=station.station_id, station_name=station.address))
         filters['response']=viableStations
-        filters['status']=None
+        filters['status']={"error_code": 0,"status":"HTTP_200_OK","error_message":None}
         return Response(filters,status=status.HTTP_200_OK)

@@ -15,4 +15,5 @@ urlpatterns= [
     path("starttripgraph",views.starttripgraph,name="starttripgraph"),
     path("endtripgraph",views.endtripgraph,name="endtripgraph"),
     path("availdamagbar",views.availdamagbar,name="availdamagbar"),
+    path("custaddgraph",views.custaddgraph,name="custaddgraph"),
 ]

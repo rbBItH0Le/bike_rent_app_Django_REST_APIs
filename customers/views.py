@@ -2,7 +2,7 @@ import re
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from datetime import datetime
+from datetime import date, datetime
 from customers.models import Customodel, Custsessionmodel, Paymentmodel
 from cycles.models import Cyclemodel, Activetripmodel
 from cycles.serialization import ShowCycleSerializers, Renterializers
@@ -76,7 +76,8 @@ def signup(request):
             return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
         hashed_password=request.POST['hashed_password']
         hashed_password_bytes = base64.b64encode(hashed_password.encode('ascii'))
-        custo=Customodel.objects.create(first_name=request.POST['first_name'],last_name=request.POST['last_name'],email=request.POST['email'],hashed_password=hashed_password_bytes,phone=request.POST['phone'])
+        addedmonth=date.today().month
+        custo=Customodel.objects.create(first_name=request.POST['first_name'],last_name=request.POST['last_name'],email=request.POST['email'],hashed_password=hashed_password_bytes,phone=request.POST['phone'], addedmonth=addedmonth)
         customer_id = custo.id
         accessTokenParams = str(emailParam + hashed_password)
         accessToken_bytes = base64.b64encode(accessTokenParams.encode('ascii'))

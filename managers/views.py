@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
-from customers.models import Paymentmodel
+from customers.models import Customodel, Paymentmodel
 from cycles.models import Cyclemodel, Tripmodel
 from managers.models import Managermodel,Managessionmodel
 from operators.models import Operatormodel,Errormodel, Stationmodel, Statusmodel
@@ -206,3 +206,15 @@ def showdetail(request):
         data['status']=Errormodel.objects.get(error_code=0)
         serialise=Managesignalize(data)
         return Response(serialise.data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def custaddgraph(request):
+    if request.method=='GET':
+        soli=[]
+        for i in range(1,13):
+            a=Customodel.objects.filter(addedmonth=i).count()
+            soli.append(a)
+        data={}
+        data['response']=soli
+        data['status']={"error_code": 0,"status":"HTTP_200_OK\n","error_message":None}
+        return Response(data,status=status.HTTP_200_OK)

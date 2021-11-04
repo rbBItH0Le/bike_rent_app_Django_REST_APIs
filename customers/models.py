@@ -20,6 +20,7 @@ class Customodel(models.Model):
     active_trip_id=models.IntegerField(null=True)
     credits=models.FloatField(default=10.00)
     session_id=models.IntegerField(null=True)
+    addedmonth=models.IntegerField(null=True)
 
     class Meta:
         db_table='t_customers'
