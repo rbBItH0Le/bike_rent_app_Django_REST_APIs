@@ -124,7 +124,7 @@ def showviablestation(request):
         viableStations = []
         for station in stations:
             if(station.availability != station.capacity):
-                viableStations.append(dict(station_id=station.station_id))
+                viableStations.append(dict(station_id=station.station_id, station_name=station.address))
         filters['response']=viableStations
         filters['status']=None
         return Response(filters,status=status.HTTP_200_OK)
