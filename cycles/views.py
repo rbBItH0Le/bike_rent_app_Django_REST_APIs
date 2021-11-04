@@ -262,6 +262,7 @@ def returno(request):
         station_availability = end_station.availability
         Stationmodel.objects.filter(station_id=active_trip.station_id).update(availability = station_availability + 1)
         Cyclemodel.objects.filter(cycle_id=active_trip.cycle_id).update(status_id=0)
+        Cyclemodel.objects.filter(cycle_id=active_trip.cycle_id).update(station_id=end_station_id_param)
         Customodel.objects.filter(id=active_trip.customer_id).update(credits=credits)
         Customodel.objects.filter(id=active_trip.customer_id).update(active_trip_id=None)
         Tripmodel.objects.create(customer_id=customer_id_param,cycle_id=active_trip.cycle_id,start_station_id=active_trip.station_id,end_station_id=end_station_id_param,address=end_station.address,post_code=end_station.post_code,location_lat=end_station.location_lat,location_long=end_station.location_long,charge=charge,ended_at=ended_at,started_at=active_trip.started_at,model_number=active_trip.model_number)
