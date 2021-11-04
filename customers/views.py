@@ -143,7 +143,7 @@ def activetripforcustomer(request):
         filters={}
         try:
             customer_id_param=request.POST['customer_id']
-            active_trip=Activetripmodel.objects.get(cycle_id=customer_id_param)
+            active_trip=Activetripmodel.objects.get(customer_id=customer_id_param)
             error=Errormodel.objects.get(error_code=0)
             filters['response']=active_trip
             filters['status']=error
