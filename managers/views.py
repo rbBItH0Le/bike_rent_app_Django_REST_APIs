@@ -159,17 +159,26 @@ def showline(request):
             return Response(data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-def tripgraph(request):
+def starttripgraph(request):
     if request.method=='GET':
         tripGraphModelList = []
         for station in Stationmodel.objects.all():
-            tripGraphModelList.append(Tripmodel.objects.filter(station_id=station.station_id).count())
+            tripGraphModelList.append(Tripmodel.objects.filter(start_station_id=station.station_id).count())
         data={}
         data['response']=tripGraphModelList
         data['status']=None
         return Response(data,status=status.HTTP_200_OK)
 
-
+@api_view(['GET'])
+def endtripgraph(request):
+    if request.method=='GET':
+        tripGraphModelList = []
+        for station in Stationmodel.objects.all():
+            tripGraphModelList.append(Tripmodel.objects.filter(end_station_id=station.station_id).count())
+        data={}
+        data['response']=tripGraphModelList
+        data['status']=None
+        return Response(data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def availdamagbar(request):
