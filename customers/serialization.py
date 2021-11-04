@@ -15,7 +15,7 @@ class Custosessionalize(serializers.ModelSerializer):
 class Payerialize(serializers.ModelSerializer):
     class Meta:
         model=Paymentmodel
-        fields=['id','customer_id','transaction_id','payment_method','card_number']
+        fields=['id','customer_id','transaction_id','payment_method','card_number', 'charge']
 
 class Singupalize(serializers.Serializer):
     response=Custserialize()
@@ -24,5 +24,9 @@ class Singupalize(serializers.Serializer):
 class Custloginalize(serializers.Serializer):
     response=Custosessionalize()
     status=Erroralize()
+
+class PaymentResponseSerialiser(serializers.Serializer):
+    response=Payerialize()
+    status=Erroralize
 
 

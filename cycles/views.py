@@ -7,10 +7,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from cycles.models import Cyclemodel,Activetripmodel, Tripmodel
 from customers.models import Customodel,Custsessionmodel
-from cycles.serialization import Cyclenalize,AddCycleSerializers,ShowCycleSerializers, Showgeorializers,Renterializers
+from cycles.serialization import AddCycleSerializers,ShowCycleSerializers, Showgeorializers,Renterializers
+from customers.serialization import PaymentResponseSerialiser
 from operators.serialization import Erroralize
 from customers.models import Paymentmodel
-from operators.models import Statusmodel,Stationmodel,Errormodel
+from operators.models import Stationmodel,Errormodel
 from datetime import datetime
 import random
 import time
@@ -245,10 +246,12 @@ def returno(request):
         a=random.randint(10,20)
         b=random.randint(0,5)
         tycle_co='TZ'+'-'+str(a)+str(b)
-        Paymentmodel.objects.create(trip_id=tid,customer_id=customer_id_param,transaction_time=timo,transaction_id=tycle_co)
-        erroro=Errormodel.objects.get(error_code=11)
-        serialize=Erroralize(erroro)
-        return Response(serialize.data,status=status.HTTP_200_OK)
+        payment_details=Paymentmodel.objects.create(trip_id=tid,customer_id=customer_id_param,transaction_time=timo,transaction_id=tycle_co)
+        paymentResponse = {}
+        paymentResponse['response']=payment_details
+        paymentResponse['status']=Errormodel.objects.get(error_code=0)
+        serializedResponse=PaymentResponseSerialiser(paymentResponse)
+        return Response(serializedResponse.data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def showactive(request):

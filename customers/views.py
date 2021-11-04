@@ -7,7 +7,7 @@ from customers.models import Customodel, Custsessionmodel, Paymentmodel
 from cycles.models import Cyclemodel, Activetripmodel
 from cycles.serialization import ShowCycleSerializers, Renterializers
 from operators.models import Errormodel, Stationmodel
-from customers.serialization import Custloginalize, Custserialize, Payerialize, Singupalize
+from customers.serialization import Custloginalize, Singupalize
 from operators.serialization import Erroralize
 import random,hashlib,base64
 
