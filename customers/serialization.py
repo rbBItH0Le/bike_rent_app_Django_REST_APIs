@@ -27,6 +27,6 @@ class Custloginalize(serializers.Serializer):
 
 class PaymentResponseSerialiser(serializers.Serializer):
     response=Payerialize()
-    status=Erroralize
+    status=Erroralize()
 
 

@@ -115,3 +115,16 @@ def showstatus(request):
         filters['status']=Errormodel.objects.get(error_code=0)
         serialize=ShowCycleStatusSerializers(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def showviablestation(request):
+    if request.method=='POST':
+        stations=Stationmodel.objects.all().order_by('station_id')
+        filters={}
+        viableStations = []
+        for station in stations:
+            if(station.availability != station.capacity):
+                viableStations.append(dict(station_id=station.station_id))
+        filters['response']=viableStations
+        filters['status']=None
+        return Response(filters,status=status.HTTP_200_OK)
