@@ -255,8 +255,8 @@ def returno(request):
         ended_at=int(time.time() * 1000)
         started_at=active_trip.started_at
         duration=ended_at-started_at
-        charge=duration/3600000
-        charge=charge * 1.5
+        charge=float(duration/3600000)
+        calculated_charge=float(charge * 1.5)
         credits=credits-charge
         end_station = Stationmodel.objects.get(station_id=end_station_id_param)
         station_availability = end_station.availability
@@ -265,7 +265,7 @@ def returno(request):
         Cyclemodel.objects.filter(cycle_id=active_trip.cycle_id).update(station_id=end_station_id_param)
         Customodel.objects.filter(id=active_trip.customer_id).update(credits=credits)
         Customodel.objects.filter(id=active_trip.customer_id).update(active_trip_id=None)
-        Tripmodel.objects.create(customer_id=customer_id_param,cycle_id=active_trip.cycle_id,start_station_id=active_trip.station_id,end_station_id=end_station_id_param,address=end_station.address,post_code=end_station.post_code,location_lat=end_station.location_lat,location_long=end_station.location_long,charge=charge,ended_at=ended_at,started_at=active_trip.started_at,model_number=active_trip.model_number)
+        Tripmodel.objects.create(customer_id=customer_id_param,cycle_id=active_trip.cycle_id,start_station_id=active_trip.station_id,end_station_id=end_station_id_param,address=end_station.address,post_code=end_station.post_code,location_lat=end_station.location_lat,location_long=end_station.location_long,charge=calculated_charge,ended_at=ended_at,started_at=active_trip.started_at,model_number=active_trip.model_number)
         Activetripmodel.objects.get(active_trip_id=active_trip.active_trip_id).delete()
         tid=Tripmodel.objects.last().trip_id
         now=datetime.now()
