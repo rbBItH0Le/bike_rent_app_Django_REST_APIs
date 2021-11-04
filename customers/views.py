@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
 from customers.models import Customodel, Custsessionmodel, Paymentmodel
-from cycles.models import Cyclemodel
-from cycles.serialization import ShowCycleSerializers
+from cycles.models import Cyclemodel, Activetripmodel
+from cycles.serialization import ShowCycleSerializers, Renterializers
 from operators.models import Errormodel, Stationmodel
 from customers.serialization import Custloginalize, Custserialize, Payerialize, Singupalize
 from operators.serialization import Erroralize
@@ -136,6 +136,25 @@ def shownearest(request):
         serialize=ShowCycleSerializers(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
 
+
+@api_view(['POST'])
+def activetripforcustomer(request):
+    if request.method=='POST':
+        filters={}
+        try:
+            customer_id_param=request.POST['customer_id']
+            active_trip=Activetripmodel.objects.get(cycle_id=customer_id_param)
+            error=Errormodel.objects.get(error_code=0)
+            filters['response']=active_trip
+            filters['status']=error
+            serialize=Renterializers(filters)
+            return Response(serialize.data,status=status.HTTP_200_OK)
+        except:
+            error=Errormodel.objects.get(error_code=3)
+            filters['response']=None
+            filters['status']=error
+            serialize=Renterializers(filters)
+            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
 
 
 
