@@ -28,25 +28,7 @@ def activetripdetails(request):
         filters['status']=erroro
         serialize=Renterializers(filters)
         return Response(serialize.data,status=status.HTTP_200_OK)
-
-@api_view(['POST'])
-def track(request):
-    if request.method=='POST':
-        if Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).exists()==False:
-            error=Errormodel.objects.get(error_code=3)
-            serialize=Erroralize(error)
-            return Response(serialize.data,status=status.HTTP_404_NOT_FOUND)
-        if Cyclemodel.objects.get(cycle_id=request.POST['cycle_id']).status_id==0 or Cyclemodel.objects.get(cycle_id=request.POST['cycle_id']).status_id==1:
-            station=Cyclemodel.objects.get(cycle_id=request.POST['cycle_id']).station_id
-            stato=Stationmodel.objects.get(station_id=station)
-            error=Errormodel.objects.get(error_code=0)
-            filters={}
-            filters['response']=stato
-            filters['status']=error
-            serialize=Showgeorializers(filters)
-            return Response(serialize.data,status=status.HTTP_200_OK)
         
-    
 
 @api_view(['POST'])
 def move(request):
@@ -79,12 +61,12 @@ def add(request):
         print(cycle_co)
         station_id_param = request.POST['station_id']
         station = Stationmodel.objects.get(station_id=station_id_param)
-        availability=station.availability
-        if availability==0:
+        available_cycles=station.availability
+        if available_cycles==station.capacity:
             error=Errormodel.objects.get(error_code=9)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        Stationmodel.objects.filter(station_id=station_id_param).update(availability=availability-1)
+        Stationmodel.objects.filter(station_id=station_id_param).update(availability=available_cycles+1)
         category = request.POST['category']
         if category.upper()=='ELECTRIC':
             battery_percentage='0'
@@ -153,24 +135,68 @@ def repairstatus(request):
 @api_view(['POST'])
 def report(request):
     if request.method=='POST':
-        if Customodel.objects.filter(id=request.POST['id']).exists()==False:
+        customer_id_param = request.POST['customer_id']
+        cycle_id_param = request.POST['cycle_id']
+        if Customodel.objects.filter(id=customer_id_param).exists()==False:
             error=Errormodel.objects.get(error_code=4)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        if Custsessionmodel.objects.filter(customer_id=request.POST['id']).exists()==False:
+        if Custsessionmodel.objects.filter(customer_id=customer_id_param).exists()==False:
             error=Errormodel.objects.get(error_code=1)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        if Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).exists()==False:
+        if Cyclemodel.objects.filter(cycle_id=cycle_id_param).exists()==False:
             error=Errormodel.objects.get(error_code=3)
             serialize=Erroralize(error)
             return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
-        Cyclemodel.objects.filter(cycle_id=request.POST['cycle_id']).update(status_id=1)
-        filters={}
-        filters['response']=Cyclemodel.objects.get(cycle_id=request.POST['cycle_id'])
-        filters['status']=Errormodel.objects.get(error_code=0)
-        serialize=AddCycleSerializers(filters)
-        return Response(serialize.data,status=status.HTTP_200_OK)
+        if Activetripmodel.objects.filter(customer_id=customer_id_param).exists()==False:
+            error=Errormodel.objects.get(error_code=1)
+            serialize=Erroralize(error)
+            return Response(serialize.data,status=status.HTTP_401_UNAUTHORIZED)
+        active_trip=Activetripmodel.objects.get(customer_id=customer_id_param)
+        paymentResponse = {}
+        started_at=active_trip.started_at
+        ended_at=int(time.time() * 1000)
+        duration=ended_at-started_at
+
+        Cyclemodel.objects.filter(cycle_id=cycle_id_param).update(status_id=1)
+        station = Stationmodel.objects.get(station_id=active_trip.station_id)
+        if duration <= 900000:
+            charge = 0
+            Customodel.objects.filter(id=active_trip.customer_id).update(active_trip_id=None)
+            Tripmodel.objects.create(customer_id=customer_id_param,cycle_id=cycle_id_param,start_station_id=active_trip.station_id,address=station.address,post_code=station.post_code,location_lat=station.location_lat,location_long=station.location_long,charge=charge,ended_at=ended_at,started_at=active_trip.started_at,model_number=active_trip.model_number)
+            Activetripmodel.objects.get(active_trip_id=active_trip.active_trip_id).delete()
+            tid=Tripmodel.objects.last().trip_id
+            now=datetime.now()
+            timo=now.strftime("%d/%m/%Y %H:%M:%S")
+            a=random.randint(10,20)
+            b=random.randint(0,5)
+            tycle_co='TZ'+'-'+str(a)+str(b)
+            payment_details=Paymentmodel.objects.create(trip_id=tid,customer_id=customer_id_param,transaction_time=timo,transaction_id=tycle_co)
+            paymentResponse['response']=payment_details
+            paymentResponse['status']=Errormodel.objects.get(error_code=0)
+            serializedResponse=PaymentResponseSerialiser(paymentResponse)
+            return Response(serializedResponse.data,status=status.HTTP_200_OK)
+        else:
+            credits=Customodel.objects.get(id=active_trip.customer_id).credits
+            charge=duration/3600000
+            charge=charge * 1.5
+            credits=credits-charge
+            Customodel.objects.filter(id=active_trip.customer_id).update(credits=credits)
+            Customodel.objects.filter(id=active_trip.customer_id).update(active_trip_id=None)
+            Tripmodel.objects.create(customer_id=customer_id_param,cycle_id=cycle_id_param,start_station_id=active_trip.station_id,address=station.address,post_code=station.post_code,location_lat=station.location_lat,location_long=station.location_long,charge=charge,ended_at=ended_at,started_at=active_trip.started_at,model_number=active_trip.model_number)
+            Activetripmodel.objects.get(active_trip_id=active_trip.active_trip_id).delete()
+            tid=Tripmodel.objects.last().trip_id
+            now=datetime.now()
+            timo=now.strftime("%d/%m/%Y %H:%M:%S")
+            a=random.randint(10,20)
+            b=random.randint(0,5)
+            tycle_co='TZ'+'-'+str(a)+str(b)
+            payment_details=Paymentmodel.objects.create(trip_id=tid,customer_id=customer_id_param,transaction_time=timo,transaction_id=tycle_co)
+            paymentResponse['response']=payment_details
+            paymentResponse['status']=Errormodel.objects.get(error_code=0)
+            serializedResponse=PaymentResponseSerialiser(paymentResponse)
+            return Response(serializedResponse.data,status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -198,7 +224,7 @@ def rent(request):
         location_lat=station.location_lat
         location_long=station.location_long
         started_at_time=int(time.time() * 1000)
-        remaining_availability=station.availability + 1
+        remaining_availability=station.availability - 1
         Stationmodel.objects.filter(station_id=station.station_id).update(availability=remaining_availability)
         active_trip_model=Activetripmodel.objects.create(customer_id=customer.id,cycle_id=cycle.cycle_id,station_id=station.station_id,address=station_address,post_code=station_postcode,location_lat=location_lat,location_long=location_long,started_at=started_at_time,model_number=cycle.model_number)
         active_trip_model_id=active_trip_model.active_trip_id
@@ -214,7 +240,8 @@ def rent(request):
 @api_view(['POST'])
 def returno(request):
     if request.method=='POST':
-        customer_id_param = request.POST['id']
+        customer_id_param = request.POST['customer_id']
+        end_station_id_param = request.POST['station_id']
         if Customodel.objects.filter(id=customer_id_param).exists()==False:
             error=Errormodel.objects.get(error_code=4)
             serialize=Erroralize(error)
@@ -227,18 +254,17 @@ def returno(request):
         credits=Customodel.objects.get(id=active_trip.customer_id).credits
         ended_at=int(time.time() * 1000)
         started_at=active_trip.started_at
-        Activetripmodel.objects.filter(customer_id=customer_id_param).update(ended_at=ended_at)
         duration=ended_at-started_at
         charge=duration/3600000
         charge=charge * 1.5
         credits=credits-charge
-        station = Stationmodel.objects.get(station_id=active_trip.station_id)
-        station_availability = station.availability
-        Stationmodel.objects.filter(station_id=active_trip.station_id).update(availability = station_availability - 1)
+        end_station = Stationmodel.objects.get(station_id=end_station_id_param)
+        station_availability = end_station.availability
+        Stationmodel.objects.filter(station_id=active_trip.station_id).update(availability = station_availability + 1)
         Cyclemodel.objects.filter(cycle_id=active_trip.cycle_id).update(status_id=0)
         Customodel.objects.filter(id=active_trip.customer_id).update(credits=credits)
         Customodel.objects.filter(id=active_trip.customer_id).update(active_trip_id=None)
-        Tripmodel.objects.create(customer_id=active_trip.customer_id,cycle_id=active_trip.cycle_id,station_id=active_trip.station_id,address=active_trip.address,post_code=active_trip.post_code,location_lat=active_trip.location_lat,location_long=active_trip.location_long,charge=charge,ended_at=active_trip.ended_at,started_at=active_trip.started_at,model_number=active_trip.model_number)
+        Tripmodel.objects.create(customer_id=customer_id_param,cycle_id=active_trip.cycle_id,start_station_id=active_trip.station_id,end_station_id=end_station_id_param,address=end_station.address,post_code=end_station.post_code,location_lat=end_station.location_lat,location_long=end_station.location_long,charge=charge,ended_at=ended_at,started_at=active_trip.started_at,model_number=active_trip.model_number)
         Activetripmodel.objects.get(active_trip_id=active_trip.active_trip_id).delete()
         tid=Tripmodel.objects.last().trip_id
         now=datetime.now()
